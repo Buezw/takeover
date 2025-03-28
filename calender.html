@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>暗色风格日历示例</title>
+  <style>
+    /* ---------------------- 全局样式 ---------------------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #1e1e1e; /* 深色背景 */
+      color: #ffffff; /* 白色文字 */
+      display: flex;
+      height: 100vh;
+      overflow: hidden; /* 防止出现滚动条，可根据需要调整 */
+    }
+
+    /* ---------------------- 左侧栏样式 ---------------------- */
+    .sidebar {
+      width: 300px; /* 从250px增加到300px，使边栏更宽 */
+      background-color: #2b2b2b;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh; /* 确保占满整个高度 */
+    }
+    .sidebar h2 {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .sidebar .calendar-list {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 20px; /* 添加底部间距 */
+    }
+    .sidebar .calendar-list li {
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      padding: 8px 12px;
+      border-radius: 4px;
+    }
+    .sidebar .calendar-list li:hover {
+      background-color: #3a3a3a;
+    }
+
+    /* 侧栏中的AI聊天样式 */
+    .sidebar-chat {
+      margin-top: auto; /* 让聊天区域靠近底部 */
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 200px; /* 最小高度 */
+    }
+
+    .chat-header {
+      padding: 10px 0;
+      margin-bottom: 10px;
+      border-top: 1px solid #3a3a3a;
+      border-bottom: 1px solid #3a3a3a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-right: 5px;
+      margin-bottom: 10px;
+      max-height: 300px; /* 最大高度 */
+    }
+
+    .message {
+      padding: 8px 12px;
+      border-radius: 8px;
+      max-width: 100%;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .user-message {
+      background-color: #4285f4;
+      align-self: flex-end;
+    }
+    
+    .ai-message {
+      background-color: #3a3a3a;
+      align-self: flex-start;
+    }
+
+    .sidebar-chat-input {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ai-chat-input {
+      flex: 1;
+      background-color: #3a3a3a;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    .ai-chat-input:focus {
+      outline: none;
+      background-color: #404040;
+    }
+
+    .ai-chat-button {
+      background-color: #4285f4;
+      border: none;
+      border-radius: 4px;
+      padding: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .ai-chat-button:hover {
+      background-color: #3367d6;
+    }
+
+    /* ---------------------- 主体区域样式 ---------------------- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      height: 100vh; /* 设置为视窗高度 */
+      box-sizing: border-box;
+    }
+
+    /* 日历容器样式 - 移除对话框后调整高度 */
+    .calendar-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%; /* 占据所有可用空间 */
+    }
+
+    /* ---------------------- 日历表格样式 ---------------------- */
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px; /* 网格之间的细分割线，可根据需要调整 */
+      background-color: #3a3a3a;
+    }
+
+    #calendarHeader {
+      margin-bottom: 1px;
+    }
+
+    #calendarGrid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      min-height: 0; /* 移除最小高度限制 */
+    }
+
+    /* 每个日期单元格 */
+    .day-cell {
+      background-color: #2b2b2b;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      height: 100%; /* 确保单元格填充整个网格区域 */
+      box-sizing: border-box;
+    }
+    .day-cell:hover {
+      background-color: #3d3d3d;
+    }
+    /* 日期数字 */
+    .day-number {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    /* 不在本月的日期，灰色显示 */
+    .not-current-month {
+      color: #666;
+    }
+    /* 星期行标题 */
+    .weekday-header {
+      background-color: #2b2b2b;
+      text-align: center;
+      font-weight: bold;
+      padding: 8px 0;
+    }
+
+    /* 添加事件标记样式 */
+    .event-markers {
+      margin-top: 5px;
+    }
+    .event-marker {
+      font-size: 10px;
+      color: #4285f4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ---------------------- 右侧栏样式 ---------------------- */
+    .right-sidebar {
+      width: 300px;
+      background-color: #2b2b2b;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .right-sidebar .date-info {
+      margin-bottom: 20px;
+    }
+    .right-sidebar .date-info h2 {
+      margin: 0;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .right-sidebar .date-info p {
+      margin: 0;
+      font-size: 14px;
+      color: #bbb;
+    }
+    .right-sidebar .event-info {
+      font-size: 14px;
+      color: #bbb;
+    }
+    .right-sidebar .event-info .no-event {
+      margin-top: 20px;
+    }
+
+    /* 主体头部样式修改 */
+    .main-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start; /* 改为左对齐 */
+      margin-bottom: 20px;
+      gap: 20px; /* 添加间距 */
+    }
+    .main-header .left-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .main-header button {
+      background-color: #3a3a3a;
+      border: none;
+      color: #ffffff;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      height: 32px; /* 统一按钮高度 */
+      line-height: 20px; /* 确保文字垂直居中 */
+    }
+    .main-header h1 {
+      font-size: 18px;
+      margin: 0;
+      line-height: 32px; /* 与按钮高度一致 */
+    }
+
+    /* 调试窗口样式 */
+    .debug-window {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        width: 300px;
+        background-color: #2b2b2b;
+        border: 1px solid #4285f4;
+        border-radius: 8px;
+        padding: 15px;
+        z-index: 1000;
+        display: none;
+    }
+    
+    .debug-window.show {
+        display: block;
+    }
+    
+    .debug-window pre {
+        color: #4285f4;
+        font-family: monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .debug-window .close-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+        color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 左侧栏 - 添加聊天功能 -->
+  <div class="sidebar">
+    <h2>添加日历</h2>
+    <ul class="calendar-list">
+      <li>yingan.huang@gmail.com</li>
+      <li>Calendar</li>
+      <li>buzewwg@outlook.com</li>
+      <li>El5f</li>
+      <li>El5f</li>
+      <li>jeffry.huang@2020eq...</li>
+    </ul>
+    
+    <!-- AI聊天区域 -->
+    <div class="sidebar-chat">
+      <div class="chat-header">
+        <span>AI 助手</span>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="message ai-message">
+          您好！我是日历助手，可以帮您：<br>
+          - 添加明天下午3点的团队会议<br>
+          - 创建下周一上午10点的项目评审<br>
+          - 安排2024年1月20日全天的年会
+        </div>
+      </div>
+      <div class="sidebar-chat-input">
+        <input type="text" 
+               class="ai-chat-input" 
+               placeholder="问我关于日程安排的问题..."
+               id="chatInput">
+        <button class="ai-chat-button" id="chatButton">发送</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中间主内容 -->
+  <div class="main-content">
+    <!-- 头部区域（“Today”按钮、月份显示、前后切换等） -->
+    <div class="main-header">
+      <button id="todayBtn">Today</button>
+      <div class="left-section">
+        <button id="prevMonthBtn">&#10094;</button>
+        <button id="nextMonthBtn">&#10095;</button>
+        <h1 id="monthTitle">February 2025</h1>
+      </div>
+    </div>
+
+    <!-- 添加日历容器 -->
+    <div class="calendar-container">
+      <div class="calendar" id="calendarHeader">
+        <div class="weekday-header">Sunday</div>
+        <div class="weekday-header">Monday</div>
+        <div class="weekday-header">Tuesday</div>
+        <div class="weekday-header">Wednesday</div>
+        <div class="weekday-header">Thursday</div>
+        <div class="weekday-header">Friday</div>
+        <div class="weekday-header">Saturday</div>
+      </div>
+      <div class="calendar" id="calendarGrid">
+        <!-- JS 动态填充日期 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧栏：显示某一天的详细信息 -->
+  <div class="right-sidebar">
+    <div class="date-info">
+      <h2 id="selectedDateTitle">Sat, Feb 1</h2>
+      <p id="selectedDateSub">Nothing planned for the day</p>
+    </div>
+    <div class="event-info">
+      <p class="no-event">Enjoy!</p>
+    </div>
+  </div>
+
+  <!-- 调试窗口 -->
+  <div class="debug-window" id="debugWindow">
+    <div class="close-btn" onclick="toggleDebugWindow()">×</div>
+    <pre id="debugContent"></pre>
+  </div>
+
+  <script>
+    // --------------------- 示例：静态显示 2025年2月 ---------------------
+    // 如果需要动态切换月份，可以在这里自行扩展
+
+    // 固定设置要显示的月份为 2025年2月
+    let displayYear = 2025;
+    let displayMonth = 1; // JS中：0=一月，1=二月，2=三月...
+
+    const calendarGrid = document.getElementById("calendarGrid");
+    const monthTitle = document.getElementById("monthTitle");
+    const selectedDateTitle = document.getElementById("selectedDateTitle");
+    const selectedDateSub = document.getElementById("selectedDateSub");
+
+    // 全局存储事件数据，格式：{ "YYYY-MM-DD": [event1, event2, ...] }
+    let events = {};
+    let currentSelectedDate = null;
+
+    // 初始化时渲染
+    renderCalendar(displayYear, displayMonth);
+
+    // “Today”按钮、前后月份按钮，仅作示例演示
+    document.getElementById("todayBtn").addEventListener("click", () => {
+      const today = new Date();
+      displayYear = today.getFullYear();
+      displayMonth = today.getMonth();
+      renderCalendar(displayYear, displayMonth);
+      fetchEventsForMonth(displayYear, displayMonth);
+    });
+    document.getElementById("prevMonthBtn").addEventListener("click", () => {
+      displayMonth--;
+      if (displayMonth < 0) {
+        displayMonth = 11;
+        displayYear--;
+      }
+      renderCalendar(displayYear, displayMonth);
+      fetchEventsForMonth(displayYear, displayMonth);
+    });
+    document.getElementById("nextMonthBtn").addEventListener("click", () => {
+      displayMonth++;
+      if (displayMonth > 11) {
+        displayMonth = 0;
+        displayYear++;
+      }
+      renderCalendar(displayYear, displayMonth);
+      fetchEventsForMonth(displayYear, displayMonth);
+    });
+
+    /**
+     * 渲染日历主函数
+     * @param {number} year
+     * @param {number} month (0-11)
+     */
+    function renderCalendar(year, month) {
+      // 更新标题（英文月份名称，可自行改为中文等）
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      monthTitle.textContent = `${monthNames[month]} ${year}`;
+
+      // 清空之前的日期格子
+      calendarGrid.innerHTML = "";
+
+      // 当月第一天与最后一天
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+
+      // 需要补足前面不在本月的日期（firstDay.getDay()返回周几）
+      const startWeekday = firstDay.getDay(); // 0=周日,1=周一...
+      // 上个月最后一天是
+      const lastDayOfPrevMonth = new Date(year, month, 0).getDate();
+
+      // 将本月日期放入数组
+      let daysArray = [];
+
+      // 先放置前面不属于本月的日期
+      for (let i = 0; i < startWeekday; i++) {
+        daysArray.unshift({
+          dayNum: lastDayOfPrevMonth - i,
+          currentMonth: false
+        });
+      }
+      // 放置当月的所有日期
+      for (let d = 1; d <= lastDay.getDate(); d++) {
+        daysArray.push({
+          dayNum: d,
+          currentMonth: true
+        });
+      }
+
+      // 如果剩余格子不足42个（6周）则继续填充到下个月的日期
+      while (daysArray.length < 42) {
+        daysArray.push({
+          dayNum: daysArray.length - (startWeekday + lastDay.getDate()) + 1,
+          currentMonth: false
+        });
+      }
+
+      // 将 42 个日期以 7 天为一行显示
+      daysArray.forEach((item, index) => {
+        const dayCell = document.createElement("div");
+        dayCell.className = "day-cell";
+
+        const dayNumber = document.createElement("div");
+        dayNumber.className = "day-number";
+        if (!item.currentMonth) {
+          dayNumber.classList.add("not-current-month");
+        }
+        dayNumber.textContent = item.dayNum;
+        dayCell.appendChild(dayNumber);
+
+        // 根据单元格数据确定实际日期（对于非本月日期，简单按 dayNum 判定前后月份）
+        const cellMonth = item.currentMonth ? month : (item.dayNum < 15 ? month + 1 : month - 1);
+        const cellDate = new Date(year, cellMonth, item.dayNum);
+        const cellDateKey = cellDate.toISOString().slice(0, 10);
+
+        // 如果该天存在事件，则在单元格中添加事件提示
+        if (events[cellDateKey] && events[cellDateKey].length > 0) {
+          const markersDiv = document.createElement("div");
+          markersDiv.className = "event-markers";
+          // 显示最多 2 条事件
+          events[cellDateKey].slice(0, 2).forEach(ev => {
+            const marker = document.createElement("div");
+            marker.className = "event-marker";
+            marker.textContent = "🔷 " + ev.title;
+            markersDiv.appendChild(marker);
+          });
+          // 若有超过 2 条事件，则显示“+X 更多”
+          if (events[cellDateKey].length > 2) {
+            const moreMarker = document.createElement("div");
+            moreMarker.className = "event-marker";
+            moreMarker.textContent = "+" + (events[cellDateKey].length - 2) + " 更多";
+            markersDiv.appendChild(moreMarker);
+          }
+          dayCell.appendChild(markersDiv);
+        }
+
+        // 点击时在右侧显示“Sat, Feb 1”等信息，并加载该天事件
+        dayCell.addEventListener("click", () => {
+          updateRightSidebar(cellDate);
+        });
+
+        calendarGrid.appendChild(dayCell);
+      });
+    }
+
+    /**
+     * Fetch events for the displayed month from FastAPI API
+     */
+    function fetchEventsForMonth(year, month) {
+      const apiUrl = `/api/events?year=${year}&month=${month+1}`;  // 修改为FastAPI服务器地址
+      
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // 将返回的数据组织为 { "YYYY-MM-DD": [event, ...] }
+          events = {};
+          data.forEach(event => {
+            const dateKey = event.date; // 格式：YYYY-MM-DD
+            if (!events[dateKey]) {
+              events[dateKey] = [];
+            }
+            events[dateKey].push(event);
+          });
+          
+          // 重新渲染日历，以显示事件提示
+          renderCalendar(displayYear, displayMonth);
+          
+          // 如果已有选中的日期，则更新右侧详情
+          if (currentSelectedDate) {
+            fetchEventsForDate(currentSelectedDate);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching events:', error);
+        });
+    }
+
+    /**
+     * Fetch events for a specific date
+     */
+    function fetchEventsForDate(date) {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const dateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      
+      const apiUrl = `/api/events?date=${dateString}`;  // 修改为FastAPI服务器地址
+      
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          displayEventsInSidebar(data, date);
+        })
+        .catch(error => {
+          console.error('Error fetching events for date:', error);
+          selectedDateSub.textContent = `Year: ${year}. Error loading events.`;
+        });
+    }
+
+    /**
+     * Display events in the right sidebar
+     */
+    function displayEventsInSidebar(eventsData, date) {
+      const eventInfo = document.querySelector('.event-info');
+      eventInfo.innerHTML = '';
+      
+      const year = date.getFullYear();
+      
+      if (eventsData.length === 0) {
+        selectedDateSub.textContent = `Year: ${year}. Nothing planned for the day.`;
+        const noEvent = document.createElement('p');
+        noEvent.className = 'no-event';
+        noEvent.textContent = 'Enjoy!';
+        eventInfo.appendChild(noEvent);
+        return;
+      }
+      
+      selectedDateSub.textContent = `Year: ${year}. ${eventsData.length} event(s) planned.`;
+      
+      eventsData.forEach(event => {
+        const eventElement = document.createElement('div');
+        eventElement.className = 'event-item';
+        eventElement.style.marginBottom = '15px';
+        eventElement.style.padding = '10px';
+        eventElement.style.backgroundColor = '#3a3a3a';
+        eventElement.style.borderRadius = '4px';
+        
+        const eventTitle = document.createElement('h3');
+        eventTitle.style.fontSize = '16px';
+        eventTitle.style.marginBottom = '5px';
+        eventTitle.textContent = event.title;
+        
+        const eventTime = document.createElement('p');
+        eventTime.style.fontSize = '14px';
+        eventTime.style.color = '#bbb';
+        eventTime.textContent = `${event.time_start || '00:00'} - ${event.time_end || '23:59'}`;
+        
+        const eventDescription = document.createElement('p');
+        eventDescription.style.fontSize = '14px';
+        eventDescription.style.marginTop = '5px';
+        eventDescription.textContent = event.description || 'No description';
+        
+        eventElement.appendChild(eventTitle);
+        eventElement.appendChild(eventTime);
+        eventElement.appendChild(eventDescription);
+        eventInfo.appendChild(eventElement);
+      });
+    }
+
+    /**
+     * Update the right sidebar content and fetch events
+     */
+    function updateRightSidebar(date) {
+      const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      ];
+      const weekDay = weekdayNames[date.getDay()];
+      const monthName = monthNames[date.getMonth()];
+      const day = date.getDate();
+      const year = date.getFullYear();
+
+      // 例如：Sat, Feb 1
+      selectedDateTitle.textContent = `${weekDay}, ${monthName} ${day}`;
+      currentSelectedDate = date;
+      
+      // 显示加载信息
+      selectedDateSub.textContent = `Year: ${year}. Loading events...`;
+      
+      // Fetch events for this date
+      fetchEventsForDate(date);
+    }
+
+    // 添加AI对话功能
+    document.getElementById('chatButton').addEventListener('click', handleAiChat);
+    document.getElementById('chatInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            handleAiChat();
+        }
+    });
+
+    function handleAiChat() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (message) {
+            // 添加用户消息
+            addMessage(message, true);
+
+            fetch('/chat', {  // 修改为FastAPI服务器地址
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 添加AI响应
+                addMessage(data.response, false);
+                
+                // 如果创建了新事件，刷新日历显示
+                if (data.event) {
+                    fetchEventsForMonth(displayYear, displayMonth);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage('抱歉，处理您的请求时出错了', false);
+            });
+
+            // 清空输入框
+            input.value = '';
+        }
+    }
+
+    function addMessage(text, isUser) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+        messageElement.innerHTML = text.replace(/\n/g, '<br>');
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // 添加调试窗口切换功能
+    function toggleDebugWindow() {
+        const debugWindow = document.getElementById('debugWindow');
+        debugWindow.classList.toggle('show');
+    }
+
+    // Initial fetch for events when calendar is first rendered
+    fetchEventsForMonth(displayYear, displayMonth);
+  </script>
+</body>
+</html>
