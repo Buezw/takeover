@@ -2,113 +2,113 @@
 
 ![Calendar Interface](https://via.placeholder.com/800x400?text=Calendar+Takeover+Interface)
 
-一个基于AI的智能日历管理系统，使用FastAPI后端和HTML/JS前端，集成DeepSeek AI实现自然语言事件创建。
+An AI-powered intelligent calendar management system, using FastAPI backend and HTML/JS frontend, integrated with DeepSeek AI for natural language event creation.
 
-## 📋 目录
+## 📋 Table of Contents
 
-- [项目概述](#项目概述)
-- [功能特性](#功能特性)
-- [系统架构](#系统架构)
-- [技术栈](#技术栈)
-- [快速开始](#快速开始)
-- [详细配置](#详细配置)
-- [API文档](#api文档)
-- [使用示例](#使用示例)
-- [问题排查](#问题排查)
-- [开发指南](#开发指南)
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [System Architecture](#system-architecture)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Configuration Details](#configuration-details)
+- [API Documentation](#api-documentation)
+- [Usage Examples](#usage-examples)
+- [Troubleshooting](#troubleshooting)
+- [Development Guide](#development-guide)
 
-## 📝 项目概述
+## 📝 Project Overview
 
-Calendar Takeover 是一个智能日历系统，允许用户通过自然语言与AI助手交互来添加和管理事件。系统提供直观的暗色主题界面，响应式设计，以及强大的自然语言处理能力。
+Calendar Takeover is an intelligent calendar system that allows users to interact with an AI assistant to add and manage events using natural language. The system provides an intuitive dark theme interface, responsive design, and powerful natural language processing capabilities.
 
-本项目旨在简化日历管理体验，让用户能够通过类似于与助手对话的方式创建复杂的日程安排，无需使用繁琐的表单或复杂的时间选择器。
+This project aims to simplify the calendar management experience, enabling users to create complex schedules through conversational interactions without cumbersome forms or complex time pickers.
 
-## ✨ 功能特性
+## ✨ Features
 
-- **🗓️ 暗色主题日历**：美观的暗色UI，支持月视图和日视图
-- **🤖 AI智能助手**：支持通过自然语言添加、修改事件
-- **📊 事件可视化**：在日历中直观显示事件，并提供详细信息查看
-- **🔄 灵活导航**：轻松在月份间切换，跳转到今天
-- **📱 响应式设计**：适配不同屏幕尺寸的设备
-- **🚀 高性能**：前后端分离架构，提供流畅体验
-- **🧩 可扩展性**：模块化设计，方便添加新功能
+- **🗓️ Dark Theme Calendar**: Aesthetic dark UI supporting month and day views
+- **🤖 AI Assistant**: Add and modify events using natural language
+- **📊 Event Visualization**: Display events visually on the calendar with detailed information
+- **🔄 Flexible Navigation**: Easily switch between months and jump to today
+- **📱 Responsive Design**: Adaptable to devices of different screen sizes
+- **🚀 High Performance**: Frontend-backend separation architecture for smooth experience
+- **🧩 Extensibility**: Modular design for easy addition of new features
 
-## 🏗️ 系统架构
+## 🏗️ System Architecture
 
-该项目采用前后端分离的微服务架构：
+The project adopts a microservice architecture with frontend and backend separation:
 
 ```
 ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
 │             │       │             │       │             │
-│  前端界面   │◄─────►│  主服务 API  │◄─────►│  DeepSeek   │
+│  Frontend   │◄─────►│  Main API   │◄─────►│  DeepSeek   │
 │ HTML/JS/CSS │       │   FastAPI   │       │     API     │
 │             │       │             │       │             │
 └─────────────┘       └──────┬──────┘       └─────────────┘
                              │
                       ┌──────▼──────┐
                       │             │
-                      │  AI 聊天    │
-                      │  微服务     │
+                      │  AI Chat    │
+                      │  Microservice │
                       │             │
                       └─────────────┘
 ```
 
-1. **前端**：HTML/CSS/JavaScript实现的单页面应用
-   - 渲染日历界面
-   - 管理用户交互
-   - 通过API与后端通信
+1. **Frontend**: Single-page application implemented with HTML/CSS/JavaScript
+   - Renders the calendar interface
+   - Manages user interactions
+   - Communicates with the backend via API
 
-2. **主后端**：处理日历事件和基础功能的FastAPI服务
-   - 事件的CRUD操作
-   - 数据存储和管理
-   - 与前端通信
+2. **Main Backend**: FastAPI service handling calendar events and basic functionalities
+   - CRUD operations for events
+   - Data storage and management
+   - Communication with the frontend
 
-3. **AI聊天微服务**：专门处理自然语言处理的FastAPI服务
-   - 接收聊天消息
-   - 调用DeepSeek API解析用户意图
-   - 将结构化事件数据返回给主服务
+3. **AI Chat Microservice**: FastAPI service dedicated to natural language processing
+   - Receives chat messages
+   - Calls DeepSeek API to parse user intent
+   - Returns structured event data to the main service
 
-4. **DeepSeek AI**：提供强大的自然语言处理能力
-   - 将用户自然语言转换为结构化数据
-   - 支持多种时间表述和事件描述方式
+4. **DeepSeek AI**: Provides powerful natural language processing capabilities
+   - Converts user natural language into structured data
+   - Supports various time expressions and event descriptions
 
-## 🛠️ 技术栈
+## 🛠️ Tech Stack
 
-- **前端**：
-  - HTML5、CSS3、JavaScript
-  - 纯原生实现，无外部依赖
-  - 响应式网格布局
+- **Frontend**:
+  - HTML5, CSS3, JavaScript
+  - Pure native implementation, no external dependencies
+  - Responsive grid layout
 
-- **后端**：
+- **Backend**:
   - Python 3.8+
-  - FastAPI 框架
-  - Uvicorn ASGI服务器
-  - HTTPX 异步HTTP客户端
+  - FastAPI framework
+  - Uvicorn ASGI server
+  - HTTPX asynchronous HTTP client
 
-- **AI服务**：
+- **AI Service**:
   - DeepSeek API
-  - 自定义提示工程
+  - Custom prompt engineering
 
-- **存储**：
-  - 当前版本：内存存储
-  - 可扩展：支持数据库存储
+- **Storage**:
+  - Current version: In-memory storage
+  - Extensible: Supports database storage
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 前提条件
+### Prerequisites
 
 - Python 3.8+
-- DeepSeek API 密钥
+- DeepSeek API Key
 
-### 安装步骤
+### Installation Steps
 
-1. **克隆仓库**
+1. **Clone the Repository**
    ```bash
    git clone https://github.com/yourusername/takeover.git
    cd takeover
    ```
 
-2. **创建虚拟环境**
+2. **Create a Virtual Environment**
    ```bash
    python -m venv takeover_env
    # Windows
@@ -117,227 +117,226 @@ Calendar Takeover 是一个智能日历系统，允许用户通过自然语言�
    source takeover_env/bin/activate
    ```
 
-3. **安装依赖**
+3. **Install Dependencies**
    ```bash
    pip install fastapi uvicorn httpx requests
    ```
 
-4. **配置API密钥**
-   在`config.py`中设置您的DeepSeek API密钥：
+4. **Configure API Key**
+   Set your DeepSeek API key in `config.py`:
    ```python
    DEEPSEEK_API_KEY = "your-api-key-here"
    ```
 
-5. **启动服务**
+5. **Start Services**
    ```bash
-   # 使用run.py启动所有服务
+   # Use run.py to start all services
    python run.py
    ```
 
-6. **访问应用**
-   在浏览器中打开 `calender.html` 文件
+6. **Access the Application**
+   Open the `calender.html` file in your browser.
 
+## ⚙️ Configuration Details
 
-## ⚙️ 详细配置
+### Configuration File
 
-### 配置文件说明
-
-项目主要配置在 `config.py` 文件中：
+The main configuration is in the `config.py` file:
 
 ```python
-# DeepSeek API配置
+# DeepSeek API Configuration
 DEEPSEEK_API_KEY = "your-api-key-here"
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
-# 错误消息配置
+# Error Messages Configuration
 ERROR_MESSAGES = {
-    "parse_error": "抱歉，我无法理解您的输入...",
-    "api_error": "抱歉，AI服务暂时不可用...",
-    "validation_error": "请确保提供了事件的日期和标题..."
+    "parse_error": "Sorry, I couldn't understand your input...",
+    "api_error": "Sorry, the AI service is temporarily unavailable...",
+    "validation_error": "Please ensure the event date and title are provided..."
 }
 
-# AI提示模板
+# AI Prompt Template
 EVENT_PROMPT = '''
-你是一个日历助手，请将用户输入转换为结构化的事件数据...
+You are a calendar assistant. Please convert user input into structured event data...
 '''
 ```
 
-### 服务端口配置
+### Server Port Configuration
 
-- **主服务**：默认端口 `8079`
-- **AI聊天服务**：默认端口 `8181`
+- **Main Service**: Default port `8079`
+- **AI Chat Service**: Default port `8181`
 
-可通过命令行参数修改：
+You can modify these via command-line arguments:
 
 ```bash
-uvicorn server:app --host 127.0.0.1 --port <自定义端口>
+uvicorn server:app --host 127.0.0.1 --port <custom-port>
 ```
 
-### 前端配置
+### Frontend Configuration
 
-前端API端点配置在 `calender.html` 中：
+Frontend API endpoint configuration is in `calender.html`:
 
 ```javascript
-// API端点配置
-const API_BASE = ''; // 默认为相对路径
-// 如需修改为绝对路径，例如：
+// API Endpoint Configuration
+const API_BASE = ''; // Default is relative path
+// To modify to an absolute path, for example:
 // const API_BASE = 'http://127.0.0.1:8079';
 ```
 
-## 📚 API文档
+## 📚 API Documentation
 
-### 主服务 API (端口 8079)
+### Main Service API (Port 8079)
 
-#### 获取事件
+#### Get Events
 
 - **GET** `/api/events`
-  - 获取所有事件
-  - 返回：事件数组
+  - Retrieve all events
+  - Returns: Array of events
 
 - **GET** `/api/events?date=YYYY-MM-DD`
-  - 获取特定日期的事件
-  - 参数：`date` - ISO格式日期字符串
-  - 返回：事件数组
+  - Retrieve events for a specific date
+  - Parameters: `date` - ISO format date string
+  - Returns: Array of events
 
 - **GET** `/api/events?year=YYYY&month=MM`
-  - 获取特定月份的事件
-  - 参数：`year` - 年份, `month` - 月份(1-12)
-  - 返回：事件数组
+  - Retrieve events for a specific month
+  - Parameters: `year` - Year, `month` - Month (1-12)
+  - Returns: Array of events
 
-#### 调试端点
+#### Debug Endpoint
 
 - **GET** `/debug`
-  - 获取服务状态信息
-  - 返回：调试信息对象
+  - Retrieve service status information
+  - Returns: Debug information object
 
-### AI聊天服务 API (端口 8181)
+### AI Chat Service API (Port 8181)
 
-#### 聊天接口
+#### Chat Interface
 
 - **POST** `/chat`
-  - 处理用户聊天消息
-  - 请求体：`{ "message": "用户消息" }`
-  - 返回：
+  - Process user chat messages
+  - Request Body: `{ "message": "User message" }`
+  - Returns:
     ```json
     {
-      "response": "AI回复消息",
+      "response": "AI reply message",
       "event": { 
-        "title": "事件标题",
+        "title": "Event title",
         "date": "2024-01-01",
         "time_start": "15:00",
         "time_end": "16:00",
-        "description": "事件描述"
+        "description": "Event description"
       }
     }
     ```
-  - 说明：当无法解析事件时，`event`字段为`null`
+  - Note: When unable to parse events, the `event` field is `null`.
 
-### 事件数据结构
+### Event Data Structure
 
 ```json
 {
-  "title": "事件标题",
+  "title": "Event title",
   "date": "YYYY-MM-DD",
   "time_start": "HH:MM",
   "time_end": "HH:MM",
-  "description": "事件描述"
+  "description": "Event description"
 }
 ```
 
-## 🎯 使用示例
+## 🎯 Usage Examples
 
-### 1. 通过AI助手添加事件
+### 1. Add Events via AI Assistant
 
-![添加事件](https://via.placeholder.com/800x400?text=添加事件)
+![Add Event](https://via.placeholder.com/800x400?text=Add+Event)
 
-1. 在左侧聊天框中输入：
+1. Enter in the left chat box:
    ```
-   添加明天下午3点的团队会议
+   Add a team meeting tomorrow at 3 PM
    ```
-2. AI助手会解析您的意图，提取关键信息
-3. 系统自动创建事件并在日历中显示
+2. The AI assistant will parse your intent and extract key information.
+3. The system automatically creates the event and displays it on the calendar.
 
-### 2. 查看日期详情
+### 2. View Date Details
 
-![日期详情](https://via.placeholder.com/800x400?text=日期详情)
+![Date Details](https://via.placeholder.com/800x400?text=Date+Details)
 
-1. 点击日历中的任何日期
-2. 右侧栏会显示该日期的所有事件
-3. 查看事件的详细信息，包括时间和描述
+1. Click on any date in the calendar.
+2. The right sidebar will display all events for that date.
+3. View detailed information about events, including time and description.
 
-### 3. 月份导航
+### 3. Month Navigation
 
-![月份导航](https://via.placeholder.com/800x400?text=月份导航)
+![Month Navigation](https://via.placeholder.com/800x400?text=Month+Navigation)
 
-1. 使用顶部的箭头按钮在月份间切换
-2. 点击"Today"按钮快速跳转到当天
+1. Use the top arrow buttons to switch between months.
+2. Click the "Today" button to quickly jump to the current day.
 
-## 🔍 问题排查
+## 🔍 Troubleshooting
 
-### 常见问题
+### Common Issues
 
-1. **AI服务无法连接**
-   - 检查DeepSeek API密钥是否正确
-   - 确认网络连接状态
-   - 查看AI服务日志
+1. **AI Service Connection Failure**
+   - Check if the DeepSeek API key is correct.
+   - Verify network connection status.
+   - Check AI service logs.
 
-2. **事件未显示在日历上**
-   - 确认服务端口配置正确
-   - 检查浏览器控制台是否有错误
-   - 验证事件格式是否正确
+2. **Events Not Displayed on Calendar**
+   - Ensure server port configuration is correct.
+   - Check browser console for errors.
+   - Validate event format.
 
-3. **自然语言解析不准确**
-   - 尝试使用更明确的语言描述事件
-   - 检查EVENT_PROMPT模板是否配置正确
-   - 考虑调整API参数降低temperature值
+3. **Natural Language Parsing Inaccuracy**
+   - Try using more explicit language to describe events.
+   - Check if the EVENT_PROMPT template is configured correctly.
+   - Consider adjusting API parameters to lower the temperature value.
 
-### 错误调试
+### Error Debugging
 
-项目包含两个测试脚本：
+The project includes two test scripts:
 
-- `test_api.py`：全面测试DeepSeek API连接
-- `simple_test.py`：简化的端到端测试
+- `test_api.py`: Comprehensive testing of DeepSeek API connection.
+- `simple_test.py`: Simplified end-to-end testing.
 
-运行这些脚本以验证系统各组件的工作状态：
+Run these scripts to verify the working status of system components:
 
 ```bash
 python test_api.py
 python simple_test.py
 ```
 
-### 日志记录
+### Logging
 
-两个主要服务都包含详细的日志记录：
+Both main services include detailed logging:
 
 ```bash
-# 查看主服务日志
+# View main service logs
 uvicorn server:app --log-level debug
 
-# 查看AI服务日志
+# View AI service logs
 uvicorn chat_service:app --log-level debug
 ```
 
-## 👨‍💻 开发指南
+## 👨‍💻 Development Guide
 
-### 项目结构
+### Project Structure
 
 ```
 e:\OneDrive\Gits\takeover\
 │
-├── calender.html        # 前端界面
-├── server.py            # 主后端服务
-├── chat_service.py      # AI聊天微服务
-├── config.py            # 配置文件
-├── test_api.py          # API测试脚本
-└── simple_test.py       # 简化测试脚本
+├── calender.html        # Frontend interface
+├── server.py            # Main backend service
+├── chat_service.py      # AI chat microservice
+├── config.py            # Configuration file
+├── test_api.py          # API test script
+└── simple_test.py       # Simplified test script
 ```
 
-### 扩展事件存储
+### Extend Event Storage
 
-当前版本使用内存存储事件，可以扩展为使用数据库：
+The current version uses in-memory storage for events, which can be extended to use a database:
 
 ```python
-# 在server.py中添加数据库支持
+# Add database support in server.py
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -347,7 +346,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# 创建事件模型
+# Create event model
 class EventModel(Base):
     __tablename__ = "events"
     id = Column(Integer, primary_key=True, index=True)
@@ -358,36 +357,36 @@ class EventModel(Base):
     description = Column(String, nullable=True)
 ```
 
-### 添加新功能
+### Add New Features
 
-扩展AI聊天功能以支持更多操作：
+Extend AI chat functionality to support more operations:
 
 ```python
-# 在chat_service.py中添加更多意图处理
+# Add more intent handling in chat_service.py
 async def chat_with_ai(message: ChatMessage):
     user_message = message.message.lower()
     
-    if any(keyword in user_message for keyword in ["添加", "创建", "安排"]):
-        # 处理添加事件的逻辑
+    if any(keyword in user_message for keyword in ["add", "create", "schedule"]):
+        # Handle logic for adding events
         return await handle_create_event(user_message)
     
-    elif any(keyword in user_message for keyword in ["查找", "搜索", "显示"]):
-        # 处理查找事件的逻辑
+    elif any(keyword in user_message for keyword in ["find", "search", "show"]):
+        # Handle logic for finding events
         return await handle_search_event(user_message)
     
-    elif any(keyword in user_message for keyword in ["取消", "删除", "移除"]):
-        # 处理删除事件的逻辑
+    elif any(keyword in user_message for keyword in ["cancel", "delete", "remove"]):
+        # Handle logic for deleting events
         return await handle_delete_event(user_message)
         
     else:
-        # 处理一般对话
-        return {"response": "我是您的日历助手..."}
+        # Handle general conversation
+        return {"response": "I am your calendar assistant..."}
 ```
 
-## 📜 许可证
+## 📜 License
 
-此项目仅供学习和研究使用。
+This project is for learning and research purposes only.
 
 ---
 
-如有任何问题或建议，欢迎提交Issue或Pull Request。
+For any questions or suggestions, feel free to submit an Issue or Pull Request. 
